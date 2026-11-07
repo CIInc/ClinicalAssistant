@@ -378,6 +378,7 @@ class RecordsPageState extends State<RecordsPage> {
                       ChoiceChip(
                         key: const ValueKey('records-specialty-all'),
                         label: const Text('All specialties'),
+                        tooltip: 'Filter records across all specialties',
                         selected: _specialtyFilter == null,
                         onSelected: (_) =>
                             setState(() => _specialtyFilter = null),
@@ -388,6 +389,9 @@ class RecordsPageState extends State<RecordsPage> {
                           key: ValueKey('records-specialty-${specialty.id}'),
                           avatar: Icon(specialty.icon, size: 16),
                           label: Text(specialty.shortLabel),
+                          tooltip: _specialtyFilter == specialty
+                              ? 'Clear ${specialty.shortLabel} specialty filter'
+                              : 'Filter records by ${specialty.title}',
                           selected: _specialtyFilter == specialty,
                           onSelected: (selected) => setState(() {
                             _specialtyFilter = selected ? specialty : null;
@@ -405,6 +409,7 @@ class RecordsPageState extends State<RecordsPage> {
                     children: [
                       FilterChip(
                         label: const Text('All'),
+                        tooltip: 'Show records from all categories and sources',
                         selected:
                             _filter == null &&
                             _specialtyFilter == null &&
@@ -421,6 +426,9 @@ class RecordsPageState extends State<RecordsPage> {
                       for (final category in RecordCategory.values) ...[
                         FilterChip(
                           label: Text(categoryLabel(category)),
+                          tooltip: _filter == category
+                              ? 'Clear ${categoryLabel(category)} filter'
+                              : 'Filter records by ${categoryLabel(category)}',
                           selected: _filter == category,
                           onSelected: (_) => setState(() => _filter = category),
                         ),
@@ -436,6 +444,9 @@ class RecordsPageState extends State<RecordsPage> {
                               : Theme.of(context).colorScheme.error,
                         ),
                         label: const Text('Out of range only'),
+                        tooltip: _filterOutOfRange
+                            ? 'Show all results including normal values'
+                            : 'Filter to show only out-of-range lab results',
                         selected: _filterOutOfRange,
                         selectedColor: Theme.of(
                           context,
@@ -448,6 +459,9 @@ class RecordsPageState extends State<RecordsPage> {
                         for (final src in availableSources) ...[
                           FilterChip(
                             label: Text('Source: $src'),
+                            tooltip: _sourceFilter == src
+                                ? 'Clear $src source filter'
+                                : 'Filter records from $src',
                             selected: _sourceFilter == src,
                             onSelected: (_) => setState(() {
                               _sourceFilter = _sourceFilter == src ? null : src;
