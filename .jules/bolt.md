@@ -1,3 +1,7 @@
+## 2026-11-04 - Memoize cross-provider reconciliation and hoist analyte normalization regex
+**Learning:** `RecordsPage.build()` was calling `CrossProviderReconciler.findReconciledGroups(widget.records)` on every frame and user interaction (search keystroke, filter chip toggle, date range adjustment, or sort selection). The reconciler iterates over all lab and vital records and derives analyte keys, which previously instantiated and compiled `RegExp(r'[^a-z0-9]')` on every record missing a LOINC code or predefined keyword, while also grouping records into multi-provider candidate maps on every render.
+**Action:** Hoist the non-alphanumeric `RegExp` pattern to a static final field on `CrossProviderReconciler` and memoize the reconciled groups map in `RecordsPageState`, recomputing only when `widget.records != oldWidget.records`.
+
 ## 2026-11-04 - Single-pass specialty count aggregation in OverviewSpecialtyBreakdown
 **Learning:** `OverviewSpecialtyBreakdown.build` was executing `records.where(specialty.matchesRecord).length` inside a loop over `DoctorVisitSpecialty.values`. For each specialty, this executed a full linear scan over all records, allocating predicate iterators and re-evaluating record categorization and regex/string matches $S \times N$ times on every overview build frame.
 **Action:** In a single iteration over `records`, evaluate the matching specialties per record and increment frequency counters in-place, eliminating repeated collection scans and lazy iterator allocations.
