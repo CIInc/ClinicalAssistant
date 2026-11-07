@@ -1441,11 +1441,16 @@ class OverviewSpecialtyBreakdown extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
+    // Single pass over records to aggregate counts across clinical specialties,
+    // avoiding O(specialties * records) repeated collection traversals and
+    // redundant closure allocations per build frame.
+    final specialties = DoctorVisitSpecialty.values;
     final specialtyCounts = <DoctorVisitSpecialty, int>{};
-    for (final specialty in DoctorVisitSpecialty.values) {
-      final count = records.where(specialty.matchesRecord).length;
-      if (count > 0) {
-        specialtyCounts[specialty] = count;
+    for (final record in records) {
+      for (final specialty in specialties) {
+        if (specialty.matchesRecord(record)) {
+          specialtyCounts[specialty] = (specialtyCounts[specialty] ?? 0) + 1;
+        }
       }
     }
 
