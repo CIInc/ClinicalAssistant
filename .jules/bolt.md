@@ -1,3 +1,7 @@
+## 2026-11-04 - Single-pass specialty count aggregation in OverviewSpecialtyBreakdown
+**Learning:** `OverviewSpecialtyBreakdown.build` was executing `records.where(specialty.matchesRecord).length` inside a loop over `DoctorVisitSpecialty.values`. For each specialty, this executed a full linear scan over all records, allocating predicate iterators and re-evaluating record categorization and regex/string matches $S \times N$ times on every overview build frame.
+**Action:** In a single iteration over `records`, evaluate the matching specialties per record and increment frequency counters in-place, eliminating repeated collection scans and lazy iterator allocations.
+
 ## 2026-10-27 - Single-pass category and source count aggregation in ExportPage
 **Learning:** `ExportPage.build` was running separate full-collection passes: `.any(isSyntheticRecord)`, `.any(!isSyntheticRecord)`, `.where().map().toSet()` for available categories and sources, and then for *every* individual filter chip (14 categories + all unique sources), running `widget.records.where(...).length`. For large record sets, this repeated full O(N) traversals $14 + S + 4$ times per build and allocated dozens of closure iterators.
 **Action:** In a single pass over `widget.records`, track real/synthetic presence and increment category and source frequency counters simultaneously. Read directly from the count maps during filter chip rendering.
