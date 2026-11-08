@@ -47,11 +47,24 @@ class _HealthTrendsPageState extends State<HealthTrendsPage> {
   String? _selectedContext;
   bool _showMovingAverage = false;
 
+  // Memoized trend series to prevent re-parsing and re-building series groups
+  // during frequent UI interactions (e.g. range changes, moving average toggles,
+  // category/specialty chip selections, or measurement switches).
+  List<HealthTrendSeries> _allSeries = const [];
+
   @override
   void initState() {
     super.initState();
     _selectedSeriesId = widget.initialSeriesId;
     _specialty = widget.initialSpecialty;
+    _updateTrendSeries();
+  }
+
+  void _updateTrendSeries() {
+    _allSeries = buildHealthTrendSeries(
+      widget.records,
+      preferredUnitSystem: widget.preferredUnitSystem,
+    );
   }
 
   @override
@@ -71,14 +84,15 @@ class _HealthTrendsPageState extends State<HealthTrendsPage> {
         _specialty = widget.initialSpecialty;
       });
     }
+    if (widget.records != oldWidget.records ||
+        widget.preferredUnitSystem != oldWidget.preferredUnitSystem) {
+      _updateTrendSeries();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final allSeries = buildHealthTrendSeries(
-      widget.records,
-      preferredUnitSystem: widget.preferredUnitSystem,
-    );
+    final allSeries = _allSeries;
     final specialtySeries = _specialty == null
         ? allSeries
         : allSeries
@@ -233,26 +247,32 @@ class _HealthTrendsPageState extends State<HealthTrendsPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        _categoryChip('All', null, specialtySeries.length),
-                        for (final category in RecordCategory.values)
-                          if (specialtySeries.any(
-                                (series) => series.category == category,
-                              ) ||
-                              _category == category)
-                            _categoryChip(
-                              categoryLabel(category),
-                              category,
-                              specialtySeries
-                                  .where(
-                                    (series) => series.category == category,
-                                  )
-                                  .length,
-                            ),
-                      ],
+                    Builder(
+                      builder: (context) {
+                        // Aggregate category counts in a single pass over specialtySeries
+                        // instead of repeatedly scanning the collection for each RecordCategory.
+                        final categoryCounts = <RecordCategory, int>{};
+                        for (final series in specialtySeries) {
+                          categoryCounts[series.category] =
+                              (categoryCounts[series.category] ?? 0) + 1;
+                        }
+
+                        return Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            _categoryChip('All', null, specialtySeries.length),
+                            for (final category in RecordCategory.values)
+                              if ((categoryCounts[category] ?? 0) > 0 ||
+                                  _category == category)
+                                _categoryChip(
+                                  categoryLabel(category),
+                                  category,
+                                  categoryCounts[category] ?? 0,
+                                ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 14),
                     MeasurementSelector(
