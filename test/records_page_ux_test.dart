@@ -72,4 +72,139 @@ void main() {
       expect(semanticsList.first.properties.button, isTrue);
     }
   });
+
+  testWidgets(
+    'RecordsPage specialty and category filter chips display accessible tooltips',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 2000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final vitalRecord = HealthRecord(
+        id: 'vital-1',
+        name: 'Heart Rate',
+        category: RecordCategory.vital,
+        value: '72',
+        unit: 'bpm',
+        recordedAt: DateTime.now(),
+        source: 'Apple Health',
+      );
+      final labRecord = HealthRecord(
+        id: 'lab-1',
+        name: 'Potassium',
+        category: RecordCategory.lab,
+        value: '6.2',
+        unit: 'mmol/L',
+        referenceRange: '3.5 – 5.0 mmol/L',
+        recordedAt: DateTime.now(),
+        source: 'Hospital Portal',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: RecordsPage(records: [vitalRecord, labRecord])),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Check Specialty ChoiceChips tooltips
+      final allSpecialtiesChip = tester.widget<ChoiceChip>(
+        find.byKey(const ValueKey('records-specialty-all')),
+      );
+      expect(
+        allSpecialtiesChip.tooltip,
+        equals('Filter records across all specialties'),
+      );
+
+      final cardioChipFinder = find.byKey(
+        const ValueKey('records-specialty-cardiology'),
+      );
+      final cardioChip = tester.widget<ChoiceChip>(cardioChipFinder);
+      expect(
+        cardioChip.tooltip,
+        equals('Filter records by Cardiology Consultation'),
+      );
+
+      // Select Cardiology filter and verify tooltip updates to clear filter
+      await tester.ensureVisible(cardioChipFinder);
+      await tester.tap(cardioChipFinder);
+      await tester.pumpAndSettle();
+
+      final activeCardioChip = tester.widget<ChoiceChip>(cardioChipFinder);
+      expect(
+        activeCardioChip.tooltip,
+        equals('Clear Cardiology specialty filter'),
+      );
+
+      // Check "All" FilterChip tooltip
+      final allCategoriesFinder = find.widgetWithText(FilterChip, 'All');
+      final allCategoriesChip = tester.widget<FilterChip>(allCategoriesFinder);
+      expect(
+        allCategoriesChip.tooltip,
+        equals('Show records from all categories and sources'),
+      );
+
+      // Check Category FilterChip tooltip (unselected vs selected)
+      final vitalsFinder = find.widgetWithText(FilterChip, 'Vitals');
+      expect(
+        tester.widget<FilterChip>(vitalsFinder).tooltip,
+        equals('Filter records by Vitals'),
+      );
+
+      await tester.tap(vitalsFinder);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<FilterChip>(vitalsFinder).tooltip,
+        equals('Clear Vitals filter'),
+      );
+
+      // Check "Out of range only" filter chip tooltip
+      final outOfRangeFinder = find.byKey(
+        const ValueKey('records-out-of-range-filter'),
+      );
+      expect(
+        tester.widget<FilterChip>(outOfRangeFinder).tooltip,
+        equals('Filter to show only out-of-range lab results'),
+      );
+
+      await tester.scrollUntilVisible(
+        outOfRangeFinder,
+        100,
+        scrollable: find.byType(Scrollable).at(1),
+      );
+      await tester.tap(outOfRangeFinder);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<FilterChip>(outOfRangeFinder).tooltip,
+        equals('Show all results including normal values'),
+      );
+
+      // Check Source FilterChip tooltip
+      final sourceFinder = find.widgetWithText(
+        FilterChip,
+        'Source: Apple Health',
+      );
+      expect(
+        tester.widget<FilterChip>(sourceFinder).tooltip,
+        equals('Filter records from Apple Health'),
+      );
+
+      await tester.scrollUntilVisible(
+        sourceFinder,
+        100,
+        scrollable: find.byType(Scrollable).at(1),
+      );
+      await tester.tap(sourceFinder);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<FilterChip>(sourceFinder).tooltip,
+        equals('Clear Apple Health source filter'),
+      );
+    },
+  );
 }
