@@ -21,3 +21,7 @@
 ## 2026-10-29 - Accessible Interactive Stat Chips with Tooltip and Semantics
 **Learning:** Small status/stat chips (such as "1 dose logged") that double as interactive shortcuts (opening detail bottom sheets on tap) are easily mistaken for plain static indicators by screen readers and mouse users. Wrapping interactive chips in `Tooltip(message: 'View adherence history')` and `Semantics(button: true, label: ...)` explicitly communicates tap behavior to both mouse users and screen readers.
 **Action:** Always wrap interactive stat/summary chips in `Tooltip` and `Semantics(button: true, label: ...)` to convey actionability.
+
+## 2026-11-09 - Accessible Expandable Composite Cards and Nested Actionable Rows
+**Learning:** Wrapping an entire collapsible container in an `InkWell` causes gesture ambiguity when expanding reveals child rows that also possess tap callbacks (such as analyte records in clinical panels). Scoping the expansion tap gesture and `Semantics(button: true, expanded: _expanded, ...)` strictly to the header element allows child rows to have clean, unconflicted `Tooltip` and `Semantics` tap targets.
+**Action:** When designing expandable multi-item cards, scope expansion gestures to the header area and provide explicit `expanded` semantics and action tooltips for individual nested items.

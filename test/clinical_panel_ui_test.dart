@@ -208,9 +208,33 @@ void main() {
           findsNothing,
         );
 
+        // Verify Semantics on collapsed panel card
+        final panelSemanticsFinder = find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.button == true &&
+              w.properties.expanded == false &&
+              (w.properties.label?.contains('Lipid Panel') ?? false) &&
+              (w.properties.label?.contains('3 tests') ?? false) &&
+              (w.properties.label?.contains('1 out of range') ?? false) &&
+              (w.properties.label?.contains('Collapsed') ?? false),
+        );
+        expect(panelSemanticsFinder, findsOneWidget);
+
         // Tap the card or expand button to expand
         await tester.tap(find.text('Lipid Panel'));
         await tester.pumpAndSettle();
+
+        // Verify Semantics on expanded panel card
+        final expandedSemanticsFinder = find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.button == true &&
+              w.properties.expanded == true &&
+              (w.properties.label?.contains('Lipid Panel') ?? false) &&
+              (w.properties.label?.contains('Expanded') ?? false),
+        );
+        expect(expandedSemanticsFinder, findsOneWidget);
 
         // Now individual analyte rows are displayed
         expect(
@@ -221,6 +245,22 @@ void main() {
         );
         expect(find.text('220 mg/dL'), findsOneWidget);
         expect(find.text('High'), findsOneWidget);
+
+        // Verify Tooltip and Semantics on analyte row
+        expect(
+          find.byTooltip('View Total Cholesterol details'),
+          findsOneWidget,
+        );
+        final analyteSemanticsFinder = find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.button == true &&
+              (w.properties.label?.contains(
+                    'Total Cholesterol, 220 mg/dL, Out of range: High, Reference range: < 200 mg/dL',
+                  ) ??
+                  false),
+        );
+        expect(analyteSemanticsFinder, findsOneWidget);
 
         expect(
           find.byKey(const ValueKey('clinical-panel-analyte-HDL Cholesterol')),
