@@ -19,8 +19,8 @@ All roadmap features and architectural decisions must strictly adhere to the fou
 
 | Version | Focus | Primary Deliverables | Target Horizon |
 | :--- | :--- | :--- | :--- |
-| **v1.0** | **Store Readiness & Hardening** | On-device AES-GCM vault, HealthKit / Health Connect ingestion, SMART-on-FHIR presets, standalone privacy policy | **Current Phase** |
-| **v1.1** | **Clinical Scope & Document OCR** | `Condition`, `Immunization`, `AllergyIntolerance`, `Procedure`, offline paper lab OCR, Rx bottle barcode scanner | Near-Term |
+| **v1.0** | **Store Readiness & Hardening** | On-device AES-GCM vault, HealthKit / Health Connect ingestion, SMART-on-FHIR presets, standalone privacy policy | **Completed** |
+| **v1.1** | **Clinical Scope & Document OCR** | `Condition`, `Immunization`, `AllergyIntolerance`, `Procedure`, offline paper lab OCR, Rx bottle barcode scanner | **Current Phase** |
 | **v1.2** | **Lab Panels, PROMs & Drug Interactions** | Grouped clinical panels (CBC, CMP, Lipid), survey scales (PHQ-9, GAD-7), offline drug-drug & food-drug interaction check | Near-Term |
 | **v1.3** | **Zero-Knowledge Portability & Backup** | Argon2id encrypted backups, private cloud sync (WebDAV, Nextcloud, iCloud, Google Drive), Shamir's ICE keys | Mid-Term |
 | **v1.4** | **Specialized Clinical Domains** | AHA/ACC blood pressure staging, CGM Ambulatory Glucose Profiles (AGP), CKD/eGFR staging, mobility biomarkers | Mid-Term |
@@ -32,7 +32,7 @@ All roadmap features and architectural decisions must strictly adhere to the fou
 
 ---
 
-## Milestone 1: v1.0 Launch & Store Readiness (Current Phase)
+## Milestone 1: v1.0 Launch & Store Readiness (Completed)
 
 Focus: Hardening current functionality, platform compliance, security review, and physical device verification.
 
@@ -60,16 +60,16 @@ Focus: Hardening current functionality, platform compliance, security review, an
 - [x] **Release Infrastructure & Privacy**:
   - [x] Standalone, public-facing Privacy Policy ([PRIVACY.md](PRIVACY.md)) emphasizing local-only data retention and zero cloud telemetry.
   - [x] In-app Privacy & Data Governance view with health permissions rationale.
-- [ ] **Store Review Submissions** ([#73](https://github.com/Aymeric/ClinicalAssistant/issues/73)):
+- [x] **Store Review Submissions** ([#73](https://github.com/Aymeric/ClinicalAssistant/issues/73)):
   - [x] iOS: Configure HealthKit and Clinical Health Records entitlement capabilities (`Runner.entitlements`).
   - [x] Android: Health Connect permission declarations and `ACTION_SHOW_PERMISSIONS_RATIONALE` intent filters (`AndroidManifest.xml`).
-  - [ ] iOS App Store submission with HealthKit human interface compliance and medical disclaimer verification.
-  - [ ] Google Play Console declaration form and Data Safety form submission (declaring no data shared with third parties).
-  - [ ] Complete end-to-end physical device testing matrix across iOS (16+) and Android (14+) physical hardware.
+  - [x] iOS App Store submission with HealthKit human interface compliance and medical disclaimer verification.
+  - [x] Google Play Console declaration form and Data Safety form submission (declaring no data shared with third parties).
+  - [x] Complete end-to-end physical device testing matrix across iOS (16+) and Android (14+) physical hardware.
 
 ---
 
-## Milestone 2: Clinical Scope, OCR, PROMs & Medication Safety (Near-Term)
+## Milestone 2: Clinical Scope, OCR, PROMs & Medication Safety (Current Phase)
 
 Focus: Expanding beyond lab observations to encompass broader clinical history, paper document ingestion, standardized survey instruments, cross-provider reconciliation, and medication safety checks.
 
