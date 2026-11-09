@@ -398,6 +398,81 @@ void main() {
       expect(savedRefreshToken, 'rotated-refresh-token');
     },
   );
+
+  test(
+    'rejects insecure or malformed end_session_endpoint in SMART configuration',
+    () async {
+      final insecureImporter = FhirPortalImporter(
+        client: MockClient((request) async {
+          if (request.url.path.endsWith('/.well-known/smart-configuration')) {
+            return http.Response(
+              jsonEncode({
+                'authorization_endpoint':
+                    'https://login.portal.example/authorize',
+                'token_endpoint': 'https://login.portal.example/token',
+                'end_session_endpoint': 'http://insecure.portal.example/logout',
+              }),
+              200,
+            );
+          }
+          return http.Response(
+            jsonEncode({'resourceType': 'Bundle', 'entry': []}),
+            200,
+          );
+        }),
+        appAuth: _FakeAppAuth(),
+      );
+
+      await expectLater(
+        insecureImporter.importLabResults(
+          fhirBaseUrl: 'https://portal.example/fhir',
+          clientId: 'registered-client',
+        ),
+        throwsFormatException,
+      );
+    },
+  );
+
+  test(
+    'accepts valid HTTPS end_session_endpoint in SMART configuration',
+    () async {
+      final fakeAppAuth = _FakeAppAuth();
+      final importer = FhirPortalImporter(
+        client: MockClient((request) async {
+          if (request.url.path.endsWith('/.well-known/smart-configuration')) {
+            return http.Response(
+              jsonEncode({
+                'authorization_endpoint':
+                    'https://login.portal.example/authorize',
+                'token_endpoint': 'https://login.portal.example/token',
+                'end_session_endpoint':
+                    'https://login.portal.example/endsession',
+              }),
+              200,
+            );
+          }
+          return http.Response(
+            jsonEncode({'resourceType': 'Bundle', 'entry': []}),
+            200,
+          );
+        }),
+        appAuth: fakeAppAuth,
+      );
+
+      await importer.importLabResults(
+        fhirBaseUrl: 'https://portal.example/fhir',
+        clientId: 'registered-client',
+      );
+
+      expect(
+        fakeAppAuth
+            .authorizationRequest!
+            .serviceConfiguration!
+            .endSessionEndpoint,
+        'https://login.portal.example/endsession',
+      );
+    },
+  );
 }
 
 class _FakeAppAuth extends FlutterAppAuth {
