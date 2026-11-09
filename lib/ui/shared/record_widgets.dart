@@ -629,144 +629,170 @@ class _ClinicalPanelCardState extends State<ClinicalPanelCard> {
                 ),
               ),
               color: colors.surfaceContainerLow,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () => setState(() => _expanded = !_expanded),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.table_rows_outlined,
-                            size: 20,
-                            color: color,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              widget.panel.name,
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.secondaryContainer,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${widget.panel.analyteCount} tests',
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: colors.onSecondaryContainer,
-                                    fontWeight: FontWeight.w600,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      button: true,
+                      expanded: _expanded,
+                      label: [
+                        widget.panel.name,
+                        '${widget.panel.analyteCount} tests',
+                        if (outOfRange > 0) '$outOfRange out of range',
+                        'Recorded ${formatRecordDate(widget.panel.recordedAt)}',
+                        'Source ${widget.panel.source}',
+                        if (widget.panel.performer != null &&
+                            widget.panel.performer!.isNotEmpty)
+                          widget.panel.performer!,
+                        _expanded ? 'Expanded' : 'Collapsed',
+                      ].join(', '),
+                      excludeSemantics: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => setState(() => _expanded = !_expanded),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.table_rows_outlined,
+                                  size: 20,
+                                  color: color,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    widget.panel.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w700),
                                   ),
-                            ),
-                          ),
-                          if (outOfRange > 0) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.errorContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.warning_amber_rounded,
-                                    size: 13,
-                                    color: colors.onErrorContainer,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2,
                                   ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    '$outOfRange out of range',
+                                  decoration: BoxDecoration(
+                                    color: colors.secondaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${widget.panel.analyteCount} tests',
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: colors.onErrorContainer,
-                                          fontWeight: FontWeight.w700,
+                                          color: colors.onSecondaryContainer,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          const SizedBox(width: 4),
-                          IconButton(
-                            icon: Icon(
-                              _expanded ? Icons.expand_less : Icons.expand_more,
-                            ),
-                            tooltip: _expanded
-                                ? 'Collapse panel'
-                                : 'Expand panel',
-                            onPressed: () =>
-                                setState(() => _expanded = !_expanded),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${formatRecordDate(widget.panel.recordedAt)}  ·  ${widget.panel.source}${widget.panel.performer != null && widget.panel.performer!.isNotEmpty ? '  ·  ${widget.panel.performer}' : ''}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                      if (_expanded) ...[
-                        if (widget.panel.conclusion != null &&
-                            widget.panel.conclusion!.isNotEmpty) ...[
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.surfaceContainerHighest.withValues(
-                                alpha: 0.5,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.notes,
-                                  size: 15,
-                                  color: colors.primary,
                                 ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    widget.panel.conclusion!,
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(fontStyle: FontStyle.italic),
+                                if (outOfRange > 0) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colors.errorContainer,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.warning_amber_rounded,
+                                          size: 13,
+                                          color: colors.onErrorContainer,
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          '$outOfRange out of range',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: colors.onErrorContainer,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
+                                ],
+                                const SizedBox(width: 4),
+                                IconButton(
+                                  icon: Icon(
+                                    _expanded
+                                        ? Icons.expand_less
+                                        : Icons.expand_more,
+                                  ),
+                                  tooltip: _expanded
+                                      ? 'Collapse panel'
+                                      : 'Expand panel',
+                                  onPressed: () =>
+                                      setState(() => _expanded = !_expanded),
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${formatRecordDate(widget.panel.recordedAt)}  ·  ${widget.panel.source}${widget.panel.performer != null && widget.panel.performer!.isNotEmpty ? '  ·  ${widget.panel.performer}' : ''}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: colors.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_expanded) ...[
+                      if (widget.panel.conclusion != null &&
+                          widget.panel.conclusion!.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
                           ),
-                        ],
-                        const SizedBox(height: 12),
-                        const Divider(height: 1),
-                        const SizedBox(height: 8),
-                        for (final record in widget.panel.records)
-                          _buildAnalyteRow(context, record, colors),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceContainerHighest.withValues(
+                              alpha: 0.5,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.notes,
+                                size: 15,
+                                color: colors.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  widget.panel.conclusion!,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 8),
+                      for (final record in widget.panel.records)
+                        _buildAnalyteRow(context, record, colors),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -795,88 +821,110 @@ class _ClinicalPanelCardState extends State<ClinicalPanelCard> {
 
     final criticalAlert = CriticalSafetyEvaluator.evaluate(record);
 
-    return InkWell(
-      key: ValueKey('clinical-panel-analyte-${record.name}'),
-      onTap: widget.onTapRecord != null
-          ? () => widget.onTapRecord!(record)
-          : null,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    record.name,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+    final isActionable = widget.onTapRecord != null;
+    final semanticParts = <String>[
+      record.name,
+      record.displayValue,
+      if (criticalAlert != null)
+        'Critical safety alert: ${criticalAlert.title}',
+      if (criticalAlert == null && isOutOfRange)
+        status == HealthReferenceStatus.above
+            ? 'Out of range: High'
+            : 'Out of range: Low',
+      if (record.referenceRange != null && record.referenceRange!.isNotEmpty)
+        'Reference range: ${record.referenceRange}',
+    ];
+
+    return Tooltip(
+      message: isActionable ? 'View ${record.name} details' : '',
+      child: Semantics(
+        button: isActionable,
+        label: semanticParts.join(', '),
+        excludeSemantics: true,
+        child: InkWell(
+          key: ValueKey('clinical-panel-analyte-${record.name}'),
+          onTap: isActionable ? () => widget.onTapRecord!(record) : null,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        record.name,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (record.referenceRange != null &&
+                          record.referenceRange!.isNotEmpty)
+                        Text(
+                          'Ref: ${record.referenceRange}',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: colors.outline, fontSize: 11),
+                        ),
+                    ],
                   ),
-                  if (record.referenceRange != null &&
-                      record.referenceRange!.isNotEmpty)
-                    Text(
-                      'Ref: ${record.referenceRange}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.outline,
-                        fontSize: 11,
+                ),
+                if (criticalAlert != null) ...[
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.error,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'CRITICAL',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.onError,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 9.5,
                       ),
                     ),
+                  ),
+                ] else if (isOutOfRange) ...[
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.errorContainer,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      status == HealthReferenceStatus.above ? 'High' : 'Low',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.onErrorContainer,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ],
-              ),
+                Text(
+                  record.displayValue,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: colors.outlineVariant,
+                ),
+              ],
             ),
-            if (criticalAlert != null) ...[
-              Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 1.5,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.error,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'CRITICAL',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: colors.onError,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 9.5,
-                  ),
-                ),
-              ),
-            ] else if (isOutOfRange) ...[
-              Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 1.5,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.errorContainer,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  status == HealthReferenceStatus.above ? 'High' : 'Low',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: colors.onErrorContainer,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ],
-            Text(
-              record.displayValue,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(width: 4),
-            Icon(Icons.chevron_right, size: 16, color: colors.outlineVariant),
-          ],
+          ),
         ),
       ),
     );
