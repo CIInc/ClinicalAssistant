@@ -1,3 +1,8 @@
+## 2026-11-08 - SMART OIDC End-Session Endpoint Validation Bypass
+**Vulnerability:** In `FhirPortalImporter._loadConfiguration`, SMART-on-FHIR discovery parsed `end_session_endpoint` without validating its scheme, host, or userinfo, unlike `authorization_endpoint` and `token_endpoint`.
+**Learning:** OIDC / SMART configuration discovery payloads can include optional endpoints like `end_session_endpoint`. If left unvalidated, an adversary controlling discovery responses or a misconfigured server could supply cleartext HTTP, `javascript:`, or credentialed URLs, risking open redirection, token leakage, or insecure external communication during sign-out flows.
+**Prevention:** Always validate all discovered OAuth/OIDC endpoints with `_validatedEndpoint`, enforcing HTTPS, non-empty host, and no embedded userinfo credentials before configuring authorization service handlers.
+
 ## 2026-09-23 - Constant-Time Buffer Comparison Timing Discrepancy on Differing Lengths
 **Vulnerability:** `VaultSecurityService.constantTimeCompare` looped only up to `min(a.length, b.length)`, creating an execution timing discrepancy that leaked the length of the shorter buffer (CWE-208).
 **Learning:** Even when length difference is accumulated into a bitwise result flag, bounding comparison iterations by the minimum buffer length allows an attacker to deduce buffer lengths via execution time measurements.

@@ -252,10 +252,18 @@ class FhirPortalImporter {
       decoded['token_endpoint']?.toString(),
       'token',
     );
+    // Security: Validate optional end_session_endpoint against insecure schemes (cleartext HTTP,
+    // javascript:) or embedded user-info to prevent open redirect and credential leakage.
+    final rawEndSession = decoded['end_session_endpoint']?.toString();
+    final endSessionEndpoint =
+        rawEndSession != null && rawEndSession.trim().isNotEmpty
+        ? _validatedEndpoint(rawEndSession, 'end_session')
+        : null;
+
     return AuthorizationServiceConfiguration(
       authorizationEndpoint: authorizationEndpoint,
       tokenEndpoint: tokenEndpoint,
-      endSessionEndpoint: decoded['end_session_endpoint']?.toString(),
+      endSessionEndpoint: endSessionEndpoint,
     );
   }
 
